@@ -15,10 +15,14 @@ async function fetchFileContent(owner, repo, filePath, ref) {
 }
 
 function parseComment(body) {
-  const lineMatch = body.match(/([^\s#]+)(?:#L(\d+)(?:-L?(\d+))?)?/);
-  const filePath = lineMatch?.[1]?.replace(/@gitagent\s+(explain|test)\s*/i, "").trim() || null;
-  const startLine = lineMatch?.[2] ? parseInt(lineMatch[2]) : null;
-  const endLine = lineMatch?.[3] ? parseInt(lineMatch[3]) : startLine;
+  const match = body.match(
+    /@gitagent\s+(?:explain|test)\s+([^\s#]+)(?:#L(\d+)(?:-L?(\d+))?)?/i
+  );
+
+  const filePath = match?.[1] || null;
+  const startLine = match?.[2] ? parseInt(match[2]) : null;
+  const endLine = match?.[3] ? parseInt(match[3]) : startLine;
+
   return { filePath, startLine, endLine };
 }
 
