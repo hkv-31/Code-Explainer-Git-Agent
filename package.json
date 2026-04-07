@@ -1,0 +1,17 @@
+{
+  "name": "code-explainer-bot",
+  "version": "0.1.0",
+  "description": "GitAgent that explains code and generates tests on PR comments",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "validate": "gitagent validate",
+    "info": "gitagent info"
+  },
+  "dependencies": {
+    "@octokit/rest": "^20.0.2"
+  },
+  "devDependencies": {
+    "@open-gitagent/gitagent": "latest"
+  }
+}

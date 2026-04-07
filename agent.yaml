@@ -1,0 +1,28 @@
+spec_version: "0.1.0"
+name: code-explainer-bot
+version: 0.1.0
+description: >
+  A GitAgent that watches for @gitagent explain and @gitagent test comments
+  on GitHub PRs and issues. Replies with plain-English explanations or
+  auto-generated unit tests — directly in the thread.
+
+author: hkv-31
+license: MIT
+
+model:
+  preferred: gemini-2.0-flash
+  fallback:
+    - gemini-1.5-flash
+  constraints:
+    temperature: 0.3
+    max_tokens: 2048
+
+skills:
+  - explain-code
+  - generate-tests
+
+tags:
+  - developer-tools
+  - code-review
+  - onboarding
+  - testing

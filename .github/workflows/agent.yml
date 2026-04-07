@@ -1,0 +1,35 @@
+name: Code Explainer Bot
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+
+jobs:
+  run-agent:
+    if: |
+      contains(github.event.comment.body, '@gitagent explain') ||
+      contains(github.event.comment.body, '@gitagent test')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout agent repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run agent
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          node -e "
+          import('./index.js').then(m => m.run(${{ toJson(github.event) }}))
+          "
