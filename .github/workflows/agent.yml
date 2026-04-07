@@ -29,7 +29,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          EVENT_JSON: ${{ toJson(github.event) }}
         run: |
-          node -e "
-          import('./index.js').then(m => m.run(${{ toJson(github.event) }}))
-          "
+          node -e '
+          const event = JSON.parse(process.env.EVENT_JSON);
+          import("./index.js").then(m => m.run(event));
+          '
