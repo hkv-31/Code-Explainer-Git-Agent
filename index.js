@@ -37,8 +37,13 @@ async function callLLM(prompt) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
   });
+  
   const data = await res.json();
-  return data.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't generate a response.";
+  console.log("GEMINI RESPONSE:", JSON.stringify(data, null, 2));
+
+  return data?.candidates?.[0]?.content?.parts?.[0]?.text
+    || data?.candidates?.[0]?.output
+    || "Sorry, I couldn't generate a response.";
 }
 
 async function postComment(owner, repo, issueNumber, body) {
