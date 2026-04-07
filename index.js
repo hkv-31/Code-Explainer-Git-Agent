@@ -130,3 +130,7 @@ export async function run(payload) {
     await handleTest({ owner, repo, issueNumber, commentBody: body, prRef });
   }
 }
+
+function add(a,b){
+  return a+b
+}
