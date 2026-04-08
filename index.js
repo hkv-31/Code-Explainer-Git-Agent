@@ -32,18 +32,26 @@ function sliceLines(content, start, end) {
 }
 
 async function callLLM(prompt) {
-  const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + process.env.GEMINI_API_KEY, {
+  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${process.env.GROQ_API_KEY}`
+    },
+    body: JSON.stringify({
+      model: "llama-3.3-70b-versatile",
+      messages: [
+        { role: "system", content: "You are a senior engineer explaining code." },
+        { role: "user", content: prompt }
+      ],
+      temperature: 0.2
+    })
   });
-  
-  const data = await res.json();
-  console.log("GEMINI RESPONSE:", JSON.stringify(data, null, 2));
 
-  return data?.candidates?.[0]?.content?.parts?.[0]?.text
-    || data?.candidates?.[0]?.output
-    || "Sorry, I couldn't generate a response.";
+  const data = await res.json();
+  console.log("GROQ RESPONSE:", JSON.stringify(data, null, 2));
+
+  return data?.choices?.[0]?.message?.content || "No response from model.";
 }
 
 async function postComment(owner, repo, issueNumber, body) {
