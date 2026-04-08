@@ -10,7 +10,8 @@
 
 **Just comment `@gitagent explain` or `@gitagent test` on any PR. Done.**
 
-[View Demo PR →](https://github.com/hkv-31/Code-Explainer-Git-Agent/pull/1)
+[View Demo PR 1 →](https://github.com/hkv-31/Gesture-Recognition/pull/1)
+[View Demo PR 2 →](https://github.com/hkv-31/Code-Explainer-Git-Agent/pull/1)
 
 </div>
 
