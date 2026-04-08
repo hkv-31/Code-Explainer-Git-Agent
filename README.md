@@ -138,12 +138,6 @@ Zero cost for a typical engineering team.
 
 ---
 
-## Built for
-
-[GitAgent Hackathon](https://hackculture.dev) by HackCulture — April 2026
-
----
-
 <div align="center">
 
 Made with coffee and one too many `@gitagent explain` comments
