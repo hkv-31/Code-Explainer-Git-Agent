@@ -51,7 +51,7 @@ In your repo → Settings → Secrets → Actions, add:
 
 | Secret | Where to get it |
 |---|---|
-| `GEMINI_API_KEY` | [Google AI Studio](https://aistudio.google.com) — free tier, no card needed |
+| `GROQ_API_KEY` | (https://console.groq.com/keys) — free tier, no card needed |
 | `GITHUB_TOKEN` | Auto-provided by GitHub Actions — nothing to do |
 
 ### 3. Install the agent (optional local use)
@@ -115,7 +115,7 @@ gitagent run . --adapter lyzr            # Lyzr Studio
 ## Free tier usage
 
 This agent runs entirely on free credits:
-- **Gemini 2.0 Flash**: 1M tokens/day free via Google AI Studio
+- **Groq**: 1000+ tokens/day free 
 - **GitHub Actions**: 2,000 free minutes/month on public repos
 - **GitHub API**: 5,000 requests/hour with a standard token
 
