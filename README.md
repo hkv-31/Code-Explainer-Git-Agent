@@ -1,24 +1,30 @@
+<div align="center">
+
+<img src="https://img.shields.io/badge/GitAgent-Hackathon-black?style=for-the-badge&logo=github" />
+<img src="https://img.shields.io/badge/Powered%20by-Groq-orange?style=for-the-badge" />
+<img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" />
+
 # Code Explainer Bot
 
-A GitAgent that lives in your GitHub repo and responds to `@gitagent` commands
-in PR comments. Tag it on any file or function and it explains the code in plain
-English — or generates unit tests instantly.
+### A GitAgent that lives inside your PRs — explains code and generates tests on demand.
 
-Built for the [GitAgent Hackathon](https://hackculture.dev) by HackCulture.
+**Just comment `@gitagent explain` or `@gitagent test` on any PR. Done.**
+
+[View Demo PR →](https://github.com/hkv-31/Code-Explainer-Git-Agent/pull/1)
+
+</div>
 
 ---
 
-## Demo
+## What it does
 
-On any PR or issue comment, type:
+Drop a comment on any pull request and the bot replies instantly — no setup, no context switching, no copy-pasting into ChatGPT.
 
 ```
 @gitagent explain src/auth/token.js#L20-L45
 ```
 
-The bot replies in-thread:
-
-> ### What this code does
+> **What this code does**
 >
 > This function validates a JWT token and extracts the user payload. It checks
 > the signature against the secret key and throws if the token is expired.
@@ -28,10 +34,9 @@ The bot replies in-thread:
 > - The `ignoreExpiration` flag is intentionally false here
 > - Returns a plain JS object, not a class instance
 >
-> **Watch out for:** If `JWT_SECRET` is undefined in env, this will throw a
-> confusing `secretOrPrivateKey` error rather than a missing env error.
+> **Watch out for:** If `JWT_SECRET` is undefined in env, this will throw a confusing `secretOrPrivateKey` error rather than a missing env error.
 
-Or generate tests:
+Or generate tests instantly:
 
 ```
 @gitagent test src/utils/format.js
@@ -39,90 +44,108 @@ Or generate tests:
 
 ---
 
-## Setup (5 minutes)
+## Commands
 
-### 1. Add this repo as a GitHub Actions dependency
-
-Copy `.github/workflows/agent.yml` into your target repository.
-
-### 2. Add secrets
-
-In your repo → Settings → Secrets → Actions, add:
-
-| Secret | Where to get it |
+| Command | What it does |
 |---|---|
-| `GROQ_API_KEY` | (https://console.groq.com/keys) — free tier, no card needed |
-| `GITHUB_TOKEN` | Auto-provided by GitHub Actions — nothing to do |
+| `@gitagent explain <file>` | Explains an entire file in plain English |
+| `@gitagent explain <file>#L10-L30` | Explains a specific line range |
+| `@gitagent test <file>` | Generates unit tests (auto-detects Jest, pytest, RSpec, etc.) |
 
-### 3. Install the agent (optional local use)
+---
+
+## Setup in 3 steps
+
+### 1. Copy the workflow into your repo
+
+```bash
+mkdir -p .github/workflows
+curl -o .github/workflows/agent.yml \
+  https://raw.githubusercontent.com/hkv-31/Code-Explainer-Git-Agent/main/.github/workflows/agent.yml
+```
+
+### 2. Add your Groq API key as a secret
+
+Go to your repo → **Settings → Secrets → Actions → New repository secret**
+
+| Secret name | Value |
+|---|---|
+| `GROQ_API_KEY` | Get free at [console.groq.com/keys](https://console.groq.com/keys) — no card required |
+
+`GITHUB_TOKEN` is auto-provided by GitHub Actions. Nothing else needed.
+
+### 3. Open a PR and try it
+
+Comment `@gitagent explain <any-file.js>` and watch the bot reply in seconds.
+
+---
+
+## How it works
+
+```
+PR comment → GitHub Actions trigger → fetch file via GitHub API
+     → send to Groq (Llama 3) → post explanation as comment reply
+```
+
+Built on the [gitagent open standard](https://github.com/open-gitagent/gitagent) — fully framework-agnostic.
+
+```
+Code-Explainer-Git-Agent/
+├── agent.yaml                  # gitagent manifest
+├── SOUL.md                     # agent identity & tone
+├── RULES.md                    # hard constraints
+├── index.js                    # runtime logic (~120 lines)
+├── skills/
+│   ├── explain-code/SKILL.md   # explain skill
+│   └── generate-tests/SKILL.md # test generation skill
+└── .github/workflows/
+    └── agent.yml               # GitHub Actions trigger
+```
+
+Export to any framework with zero code changes:
 
 ```bash
 npm install -g @open-gitagent/gitagent
-gitagent validate        # confirm agent.yaml is valid
-gitagent info            # see agent summary
-```
 
-### 4. Try it
-
-Open a PR, drop a comment with `@gitagent explain <filepath>`, and watch the bot reply.
-
----
-
-## Commands
-
-| Command | Example | What it does |
-|---|---|---|
-| `@gitagent explain <file>` | `@gitagent explain src/api.js` | Explains the whole file |
-| `@gitagent explain <file>#L<n>-L<m>` | `@gitagent explain src/api.js#L10-L30` | Explains a specific line range |
-| `@gitagent test <file>` | `@gitagent test src/utils.js` | Generates unit tests for the file |
-
----
-
-## Architecture
-
-```
-code-explainer-bot/
-├── agent.yaml          # gitagent manifest (model, skills, triggers)
-├── SOUL.md             # agent identity and communication style
-├── RULES.md            # hard constraints
-├── index.js            # runtime: parses comments, calls Gemini, posts replies
-├── skills/
-│   ├── explain-code/   # explain skill definition
-│   └── generate-tests/ # test generation skill definition
-└── .github/workflows/
-    └── agent.yml       # GitHub Actions trigger
-```
-
-The agent is framework-agnostic — export to any supported adapter:
-
-```bash
-gitagent export --format system-prompt   # plain system prompt
-gitagent export --format openai          # OpenAI Agents SDK
-gitagent export --format claude-code     # Claude Code
-gitagent run . --adapter lyzr            # Lyzr Studio
+gitagent validate                        # confirm spec compliance
+gitagent export --format system-prompt  # plain system prompt
+gitagent export --format openai         # OpenAI Agents SDK
+gitagent export --format claude-code    # Claude Code
+gitagent run . --adapter lyzr           # Lyzr Studio
 ```
 
 ---
 
 ## Why this matters
 
-- **Onboarding**: new engineers understand unfamiliar code in seconds instead of hours
-- **Code review**: reviewers can tag confusing sections and get instant context
-- **Test coverage**: generate test stubs for any file without leaving the PR
+**For new engineers:** Understand unfamiliar code in seconds instead of hours. No more "what does this even do?" blocking a review.
+
+**For code reviewers:** Tag confusing sections mid-review and get instant context without leaving the PR.
+
+**For test coverage:** Generate test stubs for any file without switching tools or breaking flow.
 
 ---
 
-## Free tier usage
+## 100% free to run
 
-This agent runs entirely on free credits:
-- **Groq**: 1000+ tokens/day free 
-- **GitHub Actions**: 2,000 free minutes/month on public repos
-- **GitHub API**: 5,000 requests/hour with a standard token
+| Tool | Free tier |
+|---|---|
+| **Groq** (Llama 3.3 70B) | ~14,400 req/day on free tier |
+| **GitHub Actions** | 2,000 min/month on public repos |
+| **GitHub API** | 5,000 req/hour |
 
-Zero cost to run for a typical engineering team.
+Zero cost for a typical engineering team.
 
 ---
 
-## License
+## Built for
 
-MIT
+[GitAgent Hackathon](https://hackculture.dev) by HackCulture — April 2026
+
+---
+
+<div align="center">
+
+Made with coffee and one too many `@gitagent explain` comments
+
+</div>
